@@ -60,8 +60,8 @@ function generateNewComputerNumber($lastNumber)
 
 <body>
     <nav class="navbar navbar-expand-lg" style="background-color: #365486;">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="index" style="color: #ffffff;">ระบบครุภัณฑ์คอมพิวเตอร์</a>
+        <div class="container p-2" style="background-color: #365486; box-shadow: none;">
+            <a class="navbar-brand" href="../orderit/dashboard.php" style="color: #ffffff; font-weight: 900;">ระบบบริหารงานซ่อม</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -74,7 +74,7 @@ function generateNewComputerNumber($lastNumber)
                         <a class="nav-link" style="color: #ffffff;" href="createDevice">เพิ่มอุปกรณ์ทั่วไป</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" style="color: #ffffff;" href="system/logout">ออกจากระบบ</a>
+                        <a class="nav-link ms-5" style="color: #ffffff;" href="system/logout">ออกจากระบบ</a>
                     </li>
                 </ul>
             </div>
@@ -124,7 +124,7 @@ function generateNewComputerNumber($lastNumber)
                     </div>
 
                 <?php } ?>
-                <div class="col-sm-4 mb-3">
+                <div class="col-sm-6 mb-3">
                     <label for="" class="form-label">เลือกรายการอุปกรณ์</label>
                     <select required class="form-select" name="list_device" id="">
                         <option value="" selected disabled>เลือกรายการอุปกรณ์</option>
@@ -142,15 +142,7 @@ function generateNewComputerNumber($lastNumber)
                     </select>
                 </div>
 
-
-                <div class="col-sm-4">
-                    <div class="mb-3" id="computer_center_number">
-                        <label for="computer_center_number_input" class="form-label">หมายเลขศูนย์คอม:</label>
-                        <input type="text" disabled value="<?= $newComputerNumber ?>" required class="form-control mb-3">
-                        <input type="hidden" name="computer_center_number" value="<?= $newComputerNumber ?>">
-                    </div>
-                </div>
-                <div class="col-sm-4">
+                <div class="col-sm-6">
                     <div class="mb-3" id="asset_number">
                         <label for="asset_number_input" class="form-label">เลขครุภัณฑ์:</label>
                         <input type="text" value="-" name="asset_number" class="form-control">
@@ -176,9 +168,13 @@ function generateNewComputerNumber($lastNumber)
                 </div>
                 <div class="col-sm-6 mb-3">
                     <label class="form-label" for="departInput">หน่วยงาน</label>
-                    <input type="text" required class="form-control" id="departInput" name="ref_depart">
+                    <input type="text" required class="form-control" id="departInput" name="ref_depart" required>
                     <input type="hidden" id="departName" name="depart_name">
                     <input type="hidden" id="departId" name="depart_id">
+
+                    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.29/dist/sweetalert2.min.css">
+
+                    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.29/dist/sweetalert2.min.js"></script>
 
                     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
                     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
@@ -186,6 +182,9 @@ function generateNewComputerNumber($lastNumber)
 
                     <script>
                         $(function() {
+                            let inputChanged = false;
+                            let alertShown = false;
+
                             $("#departInput").autocomplete({
                                     source: function(request, response) {
                                         $.ajax({
@@ -199,7 +198,7 @@ function generateNewComputerNumber($lastNumber)
                                             }
                                         });
                                     },
-                                    minLength: 2,
+                                    minLength: 1,
                                     select: function(event, ui) {
                                         $("#departInput").val(ui.item.label);
                                         $("#departId").val(ui.item.value);
@@ -215,9 +214,62 @@ function generateNewComputerNumber($lastNumber)
 
                             // Trigger select event when an item is highlighted
                             $("#departInput").on("autocompletefocus", function(event, ui) {
-                                $("#departInput").val(ui.item.label);
-                                $("#departId").val(ui.item.value);
+                                // $("#departInput").val(ui.item.label);
+                                // $("#departId").val(ui.item.value);
                                 return false;
+                            });
+
+                            $("#departInput").on("keyup", function() {
+                                inputChanged = true;
+                            });
+
+                            $("#departInput").on("blur", function() {
+                                if (inputChanged && !alertShown) {
+                                    const userInput = $(this).val().trim();
+                                    if (userInput === "") return;
+
+                                    let found = false;
+                                    $(this).autocomplete("instance").menu.element.find("div").each(function() {
+                                        if ($(this).text() === userInput) {
+                                            found = true;
+                                            return false;
+                                        }
+                                    });
+
+                                    if (!found) {
+                                        alertShown = true; // Prevent the alert from firing again
+                                        // Show SweetAlert to confirm insert data
+                                        Swal.fire({
+                                            title: "คุณต้องการเพิ่มข้อมูลนี้หรือไม่?",
+                                            icon: "info",
+                                            showCancelButton: true,
+                                            confirmButtonText: "ใช่",
+                                            cancelButtonText: "ไม่"
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                $.ajax({
+                                                    url: "insertDepart.php",
+                                                    method: "POST",
+                                                    data: {
+                                                        dataToInsert: userInput
+                                                    },
+                                                    success: function(response) {
+                                                        console.log("Data inserted successfully!");
+                                                        $("#departId").val(response); // Set inserted ID
+                                                    },
+                                                    error: function(xhr, status, error) {
+                                                        console.error("Error inserting data:", error);
+                                                    }
+                                                });
+                                            } else {
+                                                $("#departInput").val(""); // Clear input if canceled
+                                                $("#departId").val("");
+                                            }
+                                            alertShown = false; // Reset the flag after the action
+                                        });
+                                    }
+                                }
+                                inputChanged = false; // Reset the flag
                             });
                         });
                     </script>

@@ -28,8 +28,8 @@ if (isset($_GET['id'])) {
 
 <body>
     <nav class="navbar navbar-expand-lg" style="background-color: #365486;">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="index" style="color: #ffffff;">ระบบครุภัณฑ์คอมพิวเตอร์</a>
+        <div class="container p-2" style="background-color: #365486; box-shadow: none;">
+            <a class="navbar-brand" href="../orderit/dashboard.php" style="color: #ffffff; font-weight: 900;">ระบบบริหารงานซ่อม</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -42,7 +42,7 @@ if (isset($_GET['id'])) {
                         <a class="nav-link" style="color: #ffffff;" href="createDevice">เพิ่มอุปกรณ์ทั่วไป</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" style="color: #ffffff;" href="system/logout">ออกจากระบบ</a>
+                        <a class="nav-link ms-5" style="color: #ffffff;" href="system/logout">ออกจากระบบ</a>
                     </li>
                 </ul>
             </div>
@@ -118,9 +118,12 @@ if (isset($_GET['id'])) {
 
                 <div class="col-sm-4 mb-3">
                     <label class="form-label" for="departInput">หน่วยงาน</label>
-                    <input type="text" required class="form-control" value="<?= $depart['depart_name'] ?>" id="departInput" name="ref_depart">
+                    <input type="text" required class="form-control" value="<?= $depart['depart_name'] ?? '' ?>" id="departInput" name="ref_depart">
                     <input type="hidden" id="departName" name="depart_name">
                     <input type="hidden" id="departId" value="<?= $row['department'] ?>" name="depart_id">
+
+                    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.29/dist/sweetalert2.min.css">
+                    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.29/dist/sweetalert2.min.js"></script>
 
                     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
                     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
@@ -128,6 +131,9 @@ if (isset($_GET['id'])) {
 
                     <script>
                         $(function() {
+                            let inputChanged = false;
+                            let alertShown = false;
+
                             $("#departInput").autocomplete({
                                     source: function(request, response) {
                                         $.ajax({
@@ -141,7 +147,7 @@ if (isset($_GET['id'])) {
                                             }
                                         });
                                     },
-                                    minLength: 2,
+                                    minLength: 1,
                                     select: function(event, ui) {
                                         $("#departInput").val(ui.item.label);
                                         $("#departId").val(ui.item.value);
@@ -157,9 +163,62 @@ if (isset($_GET['id'])) {
 
                             // Trigger select event when an item is highlighted
                             $("#departInput").on("autocompletefocus", function(event, ui) {
-                                $("#departInput").val(ui.item.label);
-                                $("#departId").val(ui.item.value);
+                                // $("#departInput").val(ui.item.label);
+                                // $("#departId").val(ui.item.value);
                                 return false;
+                            });
+
+                            $("#departInput").on("keyup", function() {
+                                inputChanged = true;
+                            });
+
+                            $("#departInput").on("blur", function() {
+                                if (inputChanged && !alertShown) {
+                                    const userInput = $(this).val().trim();
+                                    if (userInput === "") return;
+
+                                    let found = false;
+                                    $(this).autocomplete("instance").menu.element.find("div").each(function() {
+                                        if ($(this).text() === userInput) {
+                                            found = true;
+                                            return false;
+                                        }
+                                    });
+
+                                    if (!found) {
+                                        alertShown = true; // Prevent the alert from firing again
+                                        // Show SweetAlert to confirm insert data
+                                        Swal.fire({
+                                            title: "คุณต้องการเพิ่มข้อมูลนี้หรือไม่?",
+                                            icon: "info",
+                                            showCancelButton: true,
+                                            confirmButtonText: "ใช่",
+                                            cancelButtonText: "ไม่"
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                $.ajax({
+                                                    url: "insertDepart.php",
+                                                    method: "POST",
+                                                    data: {
+                                                        dataToInsert: userInput
+                                                    },
+                                                    success: function(response) {
+                                                        console.log("Data inserted successfully!");
+                                                        $("#departId").val(response); // Set inserted ID
+                                                    },
+                                                    error: function(xhr, status, error) {
+                                                        console.error("Error inserting data:", error);
+                                                    }
+                                                });
+                                            } else {
+                                                $("#departInput").val(""); // Clear input if canceled
+                                                $("#departId").val("");
+                                            }
+                                            alertShown = false; // Reset the flag after the action
+                                        });
+                                    }
+                                }
+                                inputChanged = false; // Reset the flag
                             });
                         });
                     </script>
@@ -290,83 +349,83 @@ if (isset($_GET['id'])) {
         </form>
     </div>
     <script>
-    function loadAndExtract() {
-        const fileInput = document.getElementById("fileInput");
+        function loadAndExtract() {
+            const fileInput = document.getElementById("fileInput");
 
-        if (fileInput.files.length > 0) {
-            const file = fileInput.files[0];
-            const reader = new FileReader();
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const reader = new FileReader();
 
-            reader.onload = function (e) {
-                const content = e.target.result;
+                reader.onload = function(e) {
+                    const content = e.target.result;
 
-                const cpu = extractValue(content, "Name");
-                const socket = extractValue(content, "Package");
-                const memoryType = extractValue(content, "Memory Type");
-                const memoryCapacity = extractValue(content, "Memory Size");
-                const motherboardBrand = extractValue(content, "Board Manufacturer");
-                const motherboard = extractValue(content, "Mainboard Model");
-                const storage = extractStorageInfo(content, "Name");
-                const storageCapacity = extractValue(content, "Capacity");
-                const vga = extractDisplayAdapterInfo(content, 1)?.name || extractDisplayAdapterInfo(content, 0)?.name || "N/A";
-                const os = extractValue(content, "Windows Version");
+                    const cpu = extractValue(content, "Name");
+                    const socket = extractValue(content, "Package");
+                    const memoryType = extractValue(content, "Memory Type");
+                    const memoryCapacity = extractValue(content, "Memory Size");
+                    const motherboardBrand = extractValue(content, "Board Manufacturer");
+                    const motherboard = extractValue(content, "Mainboard Model");
+                    const storage = extractStorageInfo(content, "Name");
+                    const storageCapacity = extractValue(content, "Capacity");
+                    const vga = extractDisplayAdapterInfo(content, 1)?.name || extractDisplayAdapterInfo(content, 0)?.name || "N/A";
+                    const os = extractValue(content, "Windows Version");
 
-                // Set values to input fields
-                document.getElementById("cpu").value = cpu;
-                document.getElementById("socket").value = socket;
-                document.getElementById("memoryType").value = memoryType;
-                document.getElementById("memoryCapacity").value = memoryCapacity;
-                document.getElementById("motherboardBrand").value = motherboardBrand;
-                document.getElementById("motherboard").value = motherboard;
-                document.getElementById("storage").value = storage;
-                document.getElementById("storageCapacity").value = storageCapacity;
-                document.getElementById("vga").value = vga;
-                document.getElementById("os").value = os;
+                    // Set values to input fields
+                    document.getElementById("cpu").value = cpu;
+                    document.getElementById("socket").value = socket;
+                    document.getElementById("memoryType").value = memoryType;
+                    document.getElementById("memoryCapacity").value = memoryCapacity;
+                    document.getElementById("motherboardBrand").value = motherboardBrand;
+                    document.getElementById("motherboard").value = motherboard;
+                    document.getElementById("storage").value = storage;
+                    document.getElementById("storageCapacity").value = storageCapacity;
+                    document.getElementById("vga").value = vga;
+                    document.getElementById("os").value = os;
 
-                console.log("CPU:", cpu);
-                console.log("Socket:", socket);
-                console.log("Memory Type:", memoryType);
-                console.log("Memory Capacity:", memoryCapacity);
-                console.log("Motherboard Brand:", motherboardBrand);
-                console.log("Motherboard:", motherboard);
-                console.log("Storage:", storage);
-                console.log("Storage Capacity:", storageCapacity);
-                console.log("VGA:", vga);
-                console.log("OS:", os);
-            };
+                    console.log("CPU:", cpu);
+                    console.log("Socket:", socket);
+                    console.log("Memory Type:", memoryType);
+                    console.log("Memory Capacity:", memoryCapacity);
+                    console.log("Motherboard Brand:", motherboardBrand);
+                    console.log("Motherboard:", motherboard);
+                    console.log("Storage:", storage);
+                    console.log("Storage Capacity:", storageCapacity);
+                    console.log("VGA:", vga);
+                    console.log("OS:", os);
+                };
 
-            reader.readAsText(file);
+                reader.readAsText(file);
+            }
         }
-    }
 
-    function extractValue(content, key) {
-        const pattern = new RegExp(`${key}\\s+(.+)`);
-        const match = content.match(pattern);
-        return match ? match[1].trim() : "N/A";
-    }
-
-    function extractDisplayAdapterInfo(content, adapterIndex) {
-        const regex = new RegExp(`Display adapter ${adapterIndex}\\s+ID\\s+(.+)\\s+Name\\s+(.+)`);
-        const match = content.match(regex);
-
-        if (match) {
-            const [, id, name] = match;
-            return {
-                id,
-                name,
-            };
-        } else {
-            return null;
+        function extractValue(content, key) {
+            const pattern = new RegExp(`${key}\\s+(.+)`);
+            const match = content.match(pattern);
+            return match ? match[1].trim() : "N/A";
         }
-    }
 
-    function extractStorageInfo(content) {
-        const regex = new RegExp(`Drive[\\s\\S]+?Name\\s+(.+)`);
-        const match = content.match(regex);
+        function extractDisplayAdapterInfo(content, adapterIndex) {
+            const regex = new RegExp(`Display adapter ${adapterIndex}\\s+ID\\s+(.+)\\s+Name\\s+(.+)`);
+            const match = content.match(regex);
 
-        return match ? match[1].trim() : null;
-    }
-</script>
+            if (match) {
+                const [, id, name] = match;
+                return {
+                    id,
+                    name,
+                };
+            } else {
+                return null;
+            }
+        }
+
+        function extractStorageInfo(content) {
+            const regex = new RegExp(`Drive[\\s\\S]+?Name\\s+(.+)`);
+            const match = content.match(regex);
+
+            return match ? match[1].trim() : null;
+        }
+    </script>
 
     <!-- Link to Bootstrap 5 JS, if needed -->
     <script src="bootstrap/bootstrap-5.3.2-dist/js/bootstrap.min.js"></script>

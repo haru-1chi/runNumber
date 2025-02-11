@@ -41,7 +41,7 @@ if (isset($_POST['actAll'])) {
 
     // Fetch data from the database
     $sql = "SELECT *
-            FROM device_asset";
+            FROM device_asset WHERE is_deleted != 1";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -52,7 +52,7 @@ if (isset($_POST['actAll'])) {
         $stmt->bindParam(":depart_id", $row['depart_id']);
         $stmt->execute();
         $depart = $stmt->fetch(PDO::FETCH_ASSOC);
-        if ($row['status'] == 1) {
+        if ($row['status'] == 0) {
             $status = "ใช้งาน";
         } else {
             $status = "จำหน่าย";
@@ -61,7 +61,7 @@ if (isset($_POST['actAll'])) {
         echo '<td style="border: 1px solid black;">' . $row['computer_center_number'] . '</td>';
         echo '<td style="border: 1px solid black;">' . $row['asset_number'] . '</td>';
         echo '<td style="border: 1px solid black;">' . $row['list_device'] . '</td>';
-        echo '<td style="border: 1px solid black;">' . $depart['depart_name'] . '</td>';
+        echo '<td style="border: 1px solid black;">' . ($depart['depart_name'] ?? '-') . '</td>';
         echo '<td style="border: 1px solid black;">' . $row['brand'] . '</td>';
         echo '<td style="border: 1px solid black;">' . $row['model'] . '</td>';
         echo '<td style="border: 1px solid black;">' . $row['purchase_date'] . '</td>';
@@ -123,13 +123,15 @@ if (isset($_POST['act'])) {
 
     // Fetch data from the database
     $sql = "SELECT * 
-    FROM computer_assets 
-    WHERE (computer_center_number, id) IN (
-        SELECT computer_center_number, MAX(id) AS max_id
-        FROM computer_assets
-        GROUP BY computer_center_number
+FROM computer_assets 
+WHERE is_deleted != 1
+AND (computer_center_number, timestamp) IN (
+    SELECT computer_center_number, MAX(timestamp) AS max_timestamp
+    FROM computer_assets
+    WHERE is_deleted != 1
+    GROUP BY computer_center_number
     )
-    ORDER BY id DESC";
+    ORDER BY computer_center_number ASC";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -141,7 +143,7 @@ if (isset($_POST['act'])) {
         $stmt->bindParam(":depart_id", $row['department']);
         $stmt->execute();
         $depart = $stmt->fetch(PDO::FETCH_ASSOC);
-        if ($row['status'] == 1) {
+        if ($row['status'] == 0) {
             $status = "ใช้งาน";
         } else {
             $status = "จำหน่าย";
@@ -150,7 +152,7 @@ if (isset($_POST['act'])) {
         echo '<td style="border: 1px solid black;" scope="row">' . $row['computer_center_number'] . '</td>';
         echo '<td style="border: 1px solid black;" scope="row">' . $row['asset_number'] . '</td>';
         echo '<td style="border: 1px solid black;" scope="row">' . $row['computer_name'] . '</td>';
-        echo '<td style="border: 1px solid black;" scope="row">' . $depart['depart_name'] . '</td>';
+        echo '<td style="border: 1px solid black;" scope="row">' . ($depart['depart_name'] ?? '-') . '</td>';
         echo '<td style="border: 1px solid black;" scope="row">' . $row['equipment_location'] . '</td>';
         echo '<td style="border: 1px solid black;" scope="row">' . $row['purchase_date'] . '</td>';
         echo '<td style="border: 1px solid black;" scope="row">' . $row['upgrade_date'] . '</td>';

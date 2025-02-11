@@ -1,9 +1,31 @@
 <?php
 require_once '../config/db.php';
 
+// ฟังก์ชันสำหรับตรวจสอบและเพิ่มเลข
+function generateNewComputerNumber($lastNumber)
+{
+    if (preg_match('/^C(\d+)$/', $lastNumber, $matches)) {
+        $currentNumber = (int)$matches[1];
+        $newNumber = $currentNumber + 1;
+        return "C" . str_pad($newNumber, 5, '0', STR_PAD_LEFT);
+    } else {
+        return "C00001";
+    }
+}
+
+// ดึงหมายเลขล่าสุด
+$sql = "SELECT computer_center_number FROM computer_assets ORDER BY computer_center_number DESC LIMIT 1";
+$stmt = $conn->prepare($sql);
+$stmt->execute();
+$lastComputerNumber = $stmt->fetchColumn() ?: "C00000"; // ตั้งค่าเริ่มต้นหากไม่มีข้อมูล
+
+// สร้างหมายเลขใหม่
+$newComputerNumber = generateNewComputerNumber($lastComputerNumber);
+
+// ตรวจสอบว่ามีการส่งฟอร์มหรือไม่
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // ตรวจสอบและรับค่าจากฟอร์ม
-    $computer_center_number = $_POST['computer_center_number'];
+    // รับค่าจากฟอร์ม
+    $computer_center_number = $newComputerNumber;
     $asset_number = $_POST['asset_number'];
     $computer_name = $_POST['computer_name'];
     $department = $_POST['depart_id'];
@@ -24,13 +46,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $vga = $_POST['vga'];
     $os = $_POST['os'];
 
-    // สร้าง SQL query
+    // เตรียมคำสั่ง SQL
     $sql = "INSERT INTO computer_assets 
         (computer_center_number, asset_number, computer_name, department, equipment_location, purchase_date, upgrade_date, upgrading_person, cpu, socket, memory_type, memory_capacity, motherboard_brand, motherboard, storage, storage_capacity, storage2, storage_capacity2 , VGA, OS) 
         VALUES (:computer_center_number, :asset_number, :computer_name, :department, :equipment_location, :purchase_date, :upgrade_date, :upgrading_person, :cpu, :socket, :memory_type, :memory_capacity, :motherboard_brand, :motherboard, :storage, :storage_capacity, :storage2, :storage_capacity2, :vga, :os)";
 
-
-    // ทำการ execute query
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':computer_center_number', $computer_center_number);
     $stmt->bindParam(':asset_number', $asset_number);
@@ -55,9 +75,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($stmt->execute()) {
         $_SESSION['success'] = "เพิ่มข้อมูลเรียบร้อยแล้ว";
-        header("location: ../create");
+        header("location: ../index");
+        exit();
     } else {
         $_SESSION['error'] = "พบข้อผิดพลาด";
         header("location: ../create");
+        exit();
     }
 }

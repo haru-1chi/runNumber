@@ -5,7 +5,7 @@ require_once '../config/db.php';
 if (isset($_POST['update'])) {
 
     $asset_number = $_POST['asset_number'];
-    $computer_center_number = $_POST['computer_center_number'];
+    // $computer_center_number = $_POST['computer_center_number'];
     $computer_name = $_POST['computer_name'];
     $depart_id = $_POST['depart_id'];
     $equipment_location = $_POST['equipment_location'];
@@ -27,76 +27,78 @@ if (isset($_POST['update'])) {
     $computer_id = $_POST['computer_id'];
 
     // สร้างคำสั่ง SQL สำหรับการอัพเดทข้อมูล
-    $sql = "INSERT INTO computer_assets (
-        asset_number, 
-        computer_center_number, 
-        computer_name, 
-        department, 
-        equipment_location, 
-        purchase_date, 
-        upgrading_person, 
-        upgrade_date, 
-        CPU, 
-        socket, 
-        memory_type, 
-        memory_capacity, 
-        motherboard_brand, 
-        motherboard, 
-        storage, 
-        storage_capacity, 
-        storage2, 
-        storage_capacity2, 
-        VGA, 
-        OS
-    ) VALUES (
-        :asset_number, 
-        :computer_center_number, 
-        :computer_name, 
-        :depart_id, 
-        :equipment_location, 
-        :purchase_date, 
-        :upgrading_person, 
-        :upgrade_date, 
-        :CPU, 
-        :socket, 
-        :memory_type, 
-        :memory_capacity, 
-        :motherboard_brand, 
-        :motherboard, 
-        :storage, 
-        :storage_capacity, 
-        :storage2, 
-        :storage_capacity2, 
-        :VGA, 
-        :OS
-    );
-    ";
-    // $sql = "UPDATE computer_assets SET 
-    //         asset_number = :asset_number, 
-    //         computer_name = :computer_name, 
-    //         department = :depart_id, 
-    //         equipment_location = :equipment_location, 
-    //         purchase_date = :purchase_date, 
-    //         upgrading_person = :upgrading_person, 
-    //         upgrade_date = :upgrade_date, 
-    //         CPU = :CPU, 
-    //         socket = :socket, 
-    //         memory_type = :memory_type, 
-    //         memory_capacity = :memory_capacity, 
-    //         motherboard_brand = :motherboard_brand, 
-    //         motherboard = :motherboard, 
-    //         storage = :storage, 
-    //         storage_capacity = :storage_capacity, 
-    //         storage2 = :storage2, 
-    //         storage_capacity2 = :storage_capacity2, 
-    //         VGA = :VGA, 
-    //         OS = :OS 
-    //         WHERE id = :computer_id";
+    // $sql = "INSERT INTO computer_assets (
+    //     asset_number, 
+    //     computer_center_number, 
+    //     computer_name, 
+    //     department, 
+    //     equipment_location, 
+    //     purchase_date, 
+    //     upgrading_person, 
+    //     upgrade_date, 
+    //     CPU, 
+    //     socket, 
+    //     memory_type, 
+    //     memory_capacity, 
+    //     motherboard_brand, 
+    //     motherboard, 
+    //     storage, 
+    //     storage_capacity, 
+    //     storage2, 
+    //     storage_capacity2, 
+    //     VGA, 
+    //     OS
+    // ) VALUES (
+    //     :asset_number, 
+    //     :computer_center_number, 
+    //     :computer_name, 
+    //     :depart_id, 
+    //     :equipment_location, 
+    //     :purchase_date, 
+    //     :upgrading_person, 
+    //     :upgrade_date, 
+    //     :CPU, 
+    //     :socket, 
+    //     :memory_type, 
+    //     :memory_capacity, 
+    //     :motherboard_brand, 
+    //     :motherboard, 
+    //     :storage, 
+    //     :storage_capacity, 
+    //     :storage2, 
+    //     :storage_capacity2, 
+    //     :VGA, 
+    //     :OS
+    // );";
+    $sql = "UPDATE computer_assets SET 
+            asset_number = :asset_number, 
+            computer_name = :computer_name, 
+            department = :depart_id, 
+            equipment_location = :equipment_location, 
+            purchase_date = :purchase_date, 
+            upgrading_person = :upgrading_person, 
+            upgrade_date = :upgrade_date, 
+            CPU = :CPU, 
+            socket = :socket, 
+            memory_type = :memory_type, 
+            memory_capacity = :memory_capacity, 
+            motherboard_brand = :motherboard_brand, 
+            motherboard = :motherboard, 
+            storage = :storage, 
+            storage_capacity = :storage_capacity, 
+            storage2 = :storage2, 
+            storage_capacity2 = :storage_capacity2, 
+            VGA = :VGA, 
+            OS = :OS 
+            WHERE id = :computer_id";
 
     // ทำการเตรียมคำสั่ง SQL และทำการ execute
     $stmt = $conn->prepare($sql);
+
+    $stmt->bindParam(':computer_id', $computer_id);
+
     $stmt->bindParam(':asset_number', $asset_number);
-    $stmt->bindParam(':computer_center_number', $computer_center_number);
+    // $stmt->bindParam(':computer_center_number', $computer_center_number);
     $stmt->bindParam(':computer_name', $computer_name);
     $stmt->bindParam(':depart_id', $depart_id);
     $stmt->bindParam(':equipment_location', $equipment_location);
@@ -115,6 +117,7 @@ if (isset($_POST['update'])) {
     $stmt->bindParam(':storage_capacity2', $storage_capacity2);
     $stmt->bindParam(':VGA', $VGA);
     $stmt->bindParam(':OS', $OS);
+
     if ($stmt->execute()) {
         $_SESSION['success'] = "แก้ไขข้อมูลเรียบร้อยแล้ว";
         header("Location: ../index");
@@ -135,6 +138,8 @@ if (isset($_POST['updateDevice'])) {
     $purchase_date = $_POST['purchase_date'];
     $price = $_POST['price'];
     $computer_center_number = $_POST['computer_center_number'];
+    date_default_timezone_set('Asia/Bangkok');
+    $timestamp = date('Y-m-d H:i:s');
 
     // เตรียมคำสั่ง SQL UPDATE
     $sql = "UPDATE device_asset
@@ -145,7 +150,8 @@ if (isset($_POST['updateDevice'])) {
                 brand = :brand,
                 model = :model,
                 purchase_date = :purchase_date,
-                price = :price
+                price = :price,
+                timestamp = :timestamp
             WHERE id = :id";
 
     $stmt = $conn->prepare($sql);
@@ -157,6 +163,7 @@ if (isset($_POST['updateDevice'])) {
     $stmt->bindParam(':model', $model);
     $stmt->bindParam(':purchase_date', $purchase_date);
     $stmt->bindParam(':price', $price);
+    $stmt->bindParam(':timestamp', $timestamp);
     $stmt->bindParam(':computer_center_number', $computer_center_number);
 
     if ($stmt->execute()) {

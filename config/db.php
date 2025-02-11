@@ -1,7 +1,8 @@
 <?php
-$servername = "localhost";
-$username = "administratorsmhcc";
-$password = "msh10723@maesot";
+$servername = "172.16.190.17";
+// $servername = "localhost";
+$username = "AchirayaJ";
+$password = "Haru1chi_KzhsLov3r";
 $dbname = "run_number";
 
 try {

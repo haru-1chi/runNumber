@@ -28,9 +28,9 @@ $idCom = $_GET['id'];
 
 <body>
 
-    <nav class="navbar navbar-expand-lg" style="background-color: #365486;">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="index" style="color: #ffffff;">ระบบครุภัณฑ์คอมพิวเตอร์</a>
+<nav class="navbar navbar-expand-lg" style="background-color: #365486;">
+        <div class="container p-2" style="background-color: #365486; box-shadow: none;">
+            <a class="navbar-brand" href="../orderit/dashboard.php" style="color: #ffffff; font-weight: 900;">ระบบบริหารงานซ่อม</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -43,7 +43,7 @@ $idCom = $_GET['id'];
                         <a class="nav-link" style="color: #ffffff;" href="createDevice">เพิ่มอุปกรณ์ทั่วไป</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" style="color: #ffffff;" href="system/logout">ออกจากระบบ</a>
+                        <a class="nav-link ms-5" style="color: #ffffff;" href="system/logout">ออกจากระบบ</a>
                     </li>
                 </ul>
             </div>
@@ -85,6 +85,7 @@ $idCom = $_GET['id'];
                         <th>วันเดือนปีซื้อ</th>
                         <th>วันที่อัพเกรด</th>
                         <th>ผู้อัพเกรด</th>
+                        <th>ประทับเวลา</th>
                         <th>ดูข้อมูล</th>
                     </tr>
                 </thead>
@@ -100,11 +101,12 @@ $idCom = $_GET['id'];
                             <td><?= $row['computer_center_number'] ?></td>
                             <td><?= $row['asset_number'] ?></td>
                             <td><?= $row['computer_name'] ?></td>
-                            <td><?= $depart['depart_name'] ?></td>
+                            <td><?= $depart['depart_name'] ?? '-' ?></td>
                             <td><?= $row['equipment_location'] ?></td>
                             <td><?= $row['purchase_date'] ?></td>
                             <td><?= $row['upgrade_date'] ?></td>
                             <td><?= $row['upgrading_person'] ?></td>
+                            <td><?= $row['timestamp'] ?></td>
                             <td>
                                 <button type="button" class="btn btn-primary btn-action" data-bs-toggle="modal" data-bs-target="#com<?= $row['id'] ?>">ดูข้อมูล</button>
                                 <!-- Modal -->
@@ -175,8 +177,8 @@ $idCom = $_GET['id'];
                                     </div>
                                 </div>
                             </td>
-                         
-                    <?php  } ?>
+
+                        <?php  } ?>
                 </tbody>
             </table>
         </div>
