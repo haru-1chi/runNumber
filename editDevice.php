@@ -1,6 +1,7 @@
 <?php
 require_once 'config/db.php';
 require_once 'config/depart.php';
+require_once 'navbar.php';
 
 if (isset($_GET['id'])) {
     $id = $_GET['id'];
@@ -18,7 +19,10 @@ if (isset($_GET['id'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Link to Bootstrap 5 CSS -->
-    <link rel="stylesheet" href="bootstrap/bootstrap-5.3.2-dist/css/bootstrap.min.css">
+    <!-- <link rel="stylesheet" href="bootstrap/bootstrap-5.3.2-dist/css/bootstrap.min.css"> -->
+    <link rel="stylesheet" href="bootstrap/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
     <title>เพิ่มข้อมูลครุภัณฑ์</title>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <link rel="stylesheet" href="css/style.css">
@@ -26,7 +30,8 @@ if (isset($_GET['id'])) {
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg" style="background-color: #365486;">
+    <?php navbar(); ?>
+    <!-- <nav class="navbar navbar-expand-lg" style="background-color: #365486;">
         <div class="container p-2" style="background-color: #365486; box-shadow: none;">
             <a class="navbar-brand" href="../orderit/dashboard.php" style="color: #ffffff; font-weight: 900;">ระบบบริหารงานซ่อม</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -46,7 +51,7 @@ if (isset($_GET['id'])) {
                 </ul>
             </div>
         </div>
-    </nav>
+    </nav> -->
     <div class="container mt-5">
         <h1 class="mb-3">เพิ่มข้อมูลครุภัณฑ์</h1>
         <hr>
@@ -274,7 +279,8 @@ if (isset($_GET['id'])) {
     </div>
 
     <!-- Link to Bootstrap 5 JS, if needed -->
-    <script src="bootstrap/bootstrap-5.3.2-dist/js/bootstrap.min.js"></script>
+    <!-- <script src="bootstrap/bootstrap-5.3.2-dist/js/bootstrap.min.js"></script> -->
+    <script src="bootstrap/bootstrap/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

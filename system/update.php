@@ -204,3 +204,29 @@ if (isset($_POST['updateStatus'])) {
 
     exit();
 }
+
+if (isset($_POST['updateStatusDevice'])) {
+
+    $id = $_POST['id'];
+    $status = $_POST['status'];
+
+    $sql = "UPDATE device_asset
+    SET status = :status
+    WHERE id = :id";
+
+    $stmt = $conn->prepare($sql);
+
+    $stmt->bindParam(':status', $status);
+    $stmt->bindParam(':id', $id);
+
+    if ($stmt->execute()) {
+
+        $_SESSION['success'] = "แก้ไขข้อมูลเรียบร้อยแล้ว";
+        header("Location: ../index");
+    } else {
+        $_SESSION['error'] = "พบข้อผิดพลาด";
+        header("Location: ../index");
+    }
+
+    exit();
+}

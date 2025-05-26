@@ -2,6 +2,7 @@
 session_start();
 require_once 'config/db.php';
 require_once 'config/depart.php';
+require_once 'navbar.php';
 
 if (!isset($_SESSION["admin_log"])) {
     $_SESSION["warning"] = "กรุณาเข้าสู่ระบบ";
@@ -18,7 +19,8 @@ $idCom = $_GET['id'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="bootstrap/bootstrap-5.3.2-dist/css/bootstrap.min.css">
+    <!-- <link rel="stylesheet" href="bootstrap/bootstrap-5.3.2-dist/css/bootstrap.min.css"> -->
+    <link rel="stylesheet" href="bootstrap/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="css/style.css">
@@ -27,8 +29,8 @@ $idCom = $_GET['id'];
 </head>
 
 <body>
-
-<nav class="navbar navbar-expand-lg" style="background-color: #365486;">
+    <?php navbar(); ?>
+    <!-- <nav class="navbar navbar-expand-lg" style="background-color: #365486;">
         <div class="container p-2" style="background-color: #365486; box-shadow: none;">
             <a class="navbar-brand" href="../orderit/dashboard.php" style="color: #ffffff; font-weight: 900;">ระบบบริหารงานซ่อม</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,7 +50,7 @@ $idCom = $_GET['id'];
                 </ul>
             </div>
         </div>
-    </nav>
+    </nav> -->
     <div class="container mt-5 mb-5">
 
         <hr>
@@ -193,7 +195,8 @@ $idCom = $_GET['id'];
 
     </footer>
     <!-- Link to Bootstrap 5 JS, if needed -->
-    <script src="bootstrap/bootstrap-5.3.2-dist/js/bootstrap.min.js"></script>
+    <!-- <script src="bootstrap/bootstrap-5.3.2-dist/js/bootstrap.min.js"></script> -->
+    <script src="bootstrap/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
