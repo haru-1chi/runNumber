@@ -342,6 +342,60 @@ if (isset($_GET['id'])) {
                     <label class="form-label">OS :</label>
                     <input type="text" id="os" name="OS" class="form-control" value="<?= $row['OS'] ?>">
                 </div>
+
+                <h1>รายชื่อโปรแกรมที่ติดตั้ง</h1>
+                <hr>
+                <div class="col-sm-12 mb-3">
+                    <h5>เพิ่มโปรแกรมใหม่</h5>
+                    <input type="file" class="form-control mb-3" id="programFileInput" accept=".txt" />
+                    <button type="button" class="btn btn-secondary" onclick="loadPrograms()">Load File</button>
+                </div>
+                <div class="col-sm-12 mb-3">
+                    <div id="programCheckboxList" class="list-group"></div>
+                </div>
+                <hr>
+                <h5>โปรแกรมที่มีอยู่ปัจจุบัน</h5>
+                <?php
+                $installedPrograms = [];
+                $programStmt = $conn->prepare("SELECT * FROM installed_programs WHERE computer_assets = :id");
+                $programStmt->bindParam(":id", $id);
+                $programStmt->execute();
+                $installedPrograms = $programStmt->fetchAll(PDO::FETCH_ASSOC);
+                if ($installedPrograms) {
+                ?>
+                    <div class="col-sm-12 mb-3">
+                        <div class="list-group">
+                            <label class="list-group-item">
+                                <input type="checkbox" class="form-check-input me-1" id="toggleInstalledPrograms" checked>
+                                เลือกทั้งหมด
+                            </label>
+                            <?php foreach ($installedPrograms as $program): ?>
+                                <label class="list-group-item">
+                                    <input
+                                        class="form-check-input me-1"
+                                        type="checkbox"
+                                        name="programs[]"
+                                        value="<?= htmlspecialchars($program['program_name']) ?>"
+                                        checked>
+                                    <?= htmlspecialchars($program['program_name']) ?>
+                                </label>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                    <script>
+                        document.getElementById("toggleInstalledPrograms")?.addEventListener("change", function() {
+                            document.querySelectorAll('input[name="programs[]"]').forEach(cb => {
+                                cb.checked = this.checked;
+                            });
+                        });
+                    </script>
+                <?php
+                } else {
+                ?>
+                    <p class="text-danger">*ไม่พบรายชื่อโปรแกรม</p>
+                <?php
+                }
+                ?>
                 <div class="col-sm-12 mb-3">
                     <div class="d-grid gap-2">
                         <button type="submit" name="update" class="btn p-3 btn-primary mt-3">อัพเดทข้อมูล</button>
@@ -354,6 +408,73 @@ if (isset($_GET['id'])) {
         </form>
     </div>
     <script>
+        function loadPrograms() {
+            const alreadyInstalled = <?= json_encode(array_column($installedPrograms, 'program_name')) ?>;
+            const programFileInput = document.getElementById("programFileInput");
+
+            if (programFileInput.files.length > 0) {
+                const file = programFileInput.files[0];
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    const content = e.target.result;
+                    const lines = content.split('\n').map(line => line.trim());
+
+                    // Find the dashed line separator
+                    const startIndex = lines.findIndex(line => line.includes('---'));
+                    const programLines = lines.slice(startIndex + 1).filter(line => line.length > 0);
+
+                    const checkboxContainer = document.getElementById("programCheckboxList");
+                    checkboxContainer.innerHTML = ''; // Clear old items
+
+                    const newPrograms = programLines.filter(name => !alreadyInstalled.includes(name));
+
+                    if (newPrograms.length > 0) {
+                        const toggleLabel = document.createElement("label");
+                        toggleLabel.className = "list-group-item";
+
+                        const toggleCheckbox = document.createElement("input");
+                        toggleCheckbox.type = "checkbox";
+                        toggleCheckbox.className = "form-check-input me-3";
+                        toggleCheckbox.id = "toggleAllCheckbox";
+                        toggleCheckbox.checked = true;
+
+                        toggleLabel.appendChild(toggleCheckbox);
+                        toggleLabel.appendChild(document.createTextNode("เลือกทั้งหมด"));
+                        checkboxContainer.appendChild(toggleLabel);
+
+                        toggleCheckbox.addEventListener("change", function() {
+                            const allCheckboxes = checkboxContainer.querySelectorAll('input[name="programs[]"]');
+                            allCheckboxes.forEach(cb => cb.checked = this.checked);
+                        });
+                    }
+
+                    // ✅ Add program checkboxes
+                    newPrograms.forEach((name, index) => {
+                        const checkboxId = `program_${index}`;
+
+                        const label = document.createElement("label");
+                        label.className = "list-group-item";
+                        label.htmlFor = checkboxId;
+
+                        const checkbox = document.createElement("input");
+                        checkbox.type = "checkbox";
+                        checkbox.className = "form-check-input me-3";
+                        checkbox.id = checkboxId;
+                        checkbox.name = "programs[]";
+                        checkbox.value = name;
+                        checkbox.checked = true;
+
+                        label.appendChild(checkbox);
+                        label.appendChild(document.createTextNode(name));
+                        checkboxContainer.appendChild(label);
+                    });
+                };
+
+                reader.readAsText(file);
+            }
+        }
+
         function loadAndExtract() {
             const fileInput = document.getElementById("fileInput");
 

@@ -119,6 +119,37 @@ if (isset($_POST['update'])) {
     $stmt->bindParam(':OS', $OS);
 
     if ($stmt->execute()) {
+        $submittedPrograms = $_POST['programs'] ?? [];
+
+        // 1. Get all currently stored program names for this computer
+        $stmt = $conn->prepare("SELECT program_name FROM installed_programs WHERE computer_assets = :id");
+        $stmt->bindParam(":id", $computer_id);
+        $stmt->execute();
+        $currentPrograms = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+        // 2. Find programs to delete
+        $programsToDelete = array_diff($currentPrograms, $submittedPrograms);
+
+        // 3. Delete unchecked ones
+        if (!empty($programsToDelete)) {
+            $deleteStmt = $conn->prepare("DELETE FROM installed_programs WHERE computer_assets = :id AND program_name = :program");
+            foreach ($programsToDelete as $progName) {
+                $deleteStmt->execute([':id' => $computer_id, ':program' => $progName]);
+            }
+        }
+        if (isset($_POST['programs'])) {
+            $programs = $_POST['programs'];
+            $insertProgramStmt = $conn->prepare("INSERT INTO installed_programs (computer_assets, program_name) VALUES (:computer_assets, :program_name)");
+
+            foreach ($programs as $program) {
+                if (!in_array($program, $currentPrograms)) {
+                    $insertProgramStmt->bindParam(':computer_assets', $computer_id);
+                    $insertProgramStmt->bindParam(':program_name', $program);
+                    $insertProgramStmt->execute();
+                }
+            }
+        }
+
         $_SESSION['success'] = "แก้ไขข้อมูลเรียบร้อยแล้ว";
         header("Location: ../index");
     } else {

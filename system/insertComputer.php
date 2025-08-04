@@ -74,6 +74,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->bindParam(':os', $os);
 
     if ($stmt->execute()) {
+
+        if (isset($_POST['programs'])) {
+
+            $computer_id = $conn->lastInsertId();
+            
+            $programs = $_POST['programs'];
+            $insertProgramStmt = $conn->prepare("INSERT INTO installed_programs (computer_assets, program_name) VALUES (:computer_assets, :program_name)");
+
+            foreach ($programs as $program) {
+                $insertProgramStmt->bindParam(':computer_assets', $computer_id);
+                $insertProgramStmt->bindParam(':program_name', $program);
+                $insertProgramStmt->execute();
+            }
+        }
+
         $_SESSION['success'] = "เพิ่มข้อมูลเรียบร้อยแล้ว";
         header("location: ../index");
         exit();

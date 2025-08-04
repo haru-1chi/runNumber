@@ -328,9 +328,8 @@ function generateNewComputerNumber($lastNumber)
                 <div class="col-sm-4 mb-3">
                     <label class="form-label" for="motherboard_brand">Motherboard Brand:</label>
                     <input type="text" id="motherboardBrand" name="motherboard_brand" class="form-control"><br>
-
-
                 </div>
+
                 <div class="col-sm-4 mb-3">
                     <label class="form-label" for="motherboard">Motherboard:</label>
                     <input type="text" id="motherboard" name="motherboard" class="form-control"><br>
@@ -361,6 +360,17 @@ function generateNewComputerNumber($lastNumber)
                     <label class="form-label" for="storage_capacity">OS:</label>
                     <input type="text" id="os" name="os" class="form-control"><br>
                 </div>
+
+                <h1>รายชื่อโปรแกรมที่ติดตั้ง</h1>
+                <hr>
+                <div class="col-sm-12 mb-3">
+                    <input type="file" class="form-control mb-3" id="programFileInput" accept=".txt" />
+                    <button type="button" class="btn btn-secondary" onclick="loadPrograms()">โหลดรายชื่อโปรแกรม</button>
+                </div>
+                <div class="col-sm-12 mb-3">
+                    <div id="programCheckboxList" class="list-group"></div>
+                </div>
+
                 <div class="col-sm-12 mb-3">
                     <div class="d-grid gap-2">
                         <input type="submit" value="เพิ่มข้อมูล" class="btn p-3 btn-primary">
@@ -371,6 +381,73 @@ function generateNewComputerNumber($lastNumber)
         </form>
     </div>
     <script>
+        function loadPrograms() {
+            const programFileInput = document.getElementById("programFileInput");
+
+            if (programFileInput.files.length > 0) {
+                const file = programFileInput.files[0];
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    const content = e.target.result;
+                    const lines = content.split('\n').map(line => line.trim());
+
+                    // Find the dashed line separator
+                    const startIndex = lines.findIndex(line => line.includes('---'));
+                    const programLines = lines.slice(startIndex + 1).filter(line => line.length > 0);
+
+                    const checkboxContainer = document.getElementById("programCheckboxList");
+                    checkboxContainer.innerHTML = ''; // Clear old items
+
+                    // 🔁 Add toggle all checkbox
+                    const toggleLabel = document.createElement("label");
+                    toggleLabel.className = "list-group-item";
+
+                    const toggleCheckbox = document.createElement("input");
+                    toggleCheckbox.type = "checkbox";
+                    toggleCheckbox.className = "form-check-input me-3";
+                    toggleCheckbox.id = "toggleAllCheckbox";
+                    toggleCheckbox.checked = true;
+
+                    toggleLabel.appendChild(toggleCheckbox);
+                    toggleLabel.appendChild(document.createTextNode("เลือกทั้งหมด"));
+                    checkboxContainer.appendChild(toggleLabel);
+
+                    // ⛏ Add logic for toggling all
+                    toggleCheckbox.addEventListener("change", function() {
+                        const allCheckboxes = checkboxContainer.querySelectorAll('input[name="programs[]"]');
+                        allCheckboxes.forEach(cb => cb.checked = this.checked);
+                    });
+
+                    // ✅ Add program checkboxes
+                    programLines.forEach((name, index) => {
+                        const checkboxId = `program_${index}`;
+
+                        const label = document.createElement("label");
+                        label.className = "list-group-item";
+                        label.htmlFor = checkboxId;
+
+                        const checkbox = document.createElement("input");
+                        checkbox.type = "checkbox";
+                        checkbox.className = "form-check-input me-3";
+                        checkbox.id = checkboxId;
+                        checkbox.name = "programs[]";
+                        checkbox.value = name;
+                        checkbox.checked = true;
+
+                        label.appendChild(checkbox);
+                        label.appendChild(document.createTextNode(name));
+
+                        checkboxContainer.appendChild(label);
+                    });
+                };
+
+                reader.readAsText(file);
+            }
+        }
+
+
+
         function loadAndExtract() {
             const fileInput = document.getElementById("fileInput");
             const userCpuInput = document.getElementById("userCpu");

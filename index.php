@@ -94,7 +94,7 @@ if (isset($_GET['idDevice'])) {
             </div>
         </div>
     </nav> -->
-    <div class="container mt-5 mb-5">
+    <div class="container mt-5 mb-4">
         <hr>
         <!-- Alerts -->
         <?php foreach (['error', 'warning', 'success'] as $type) {
@@ -162,14 +162,7 @@ if (isset($_GET['idDevice'])) {
             </table>
         </div>
     </div>
-    <br>
-    <br>
-    <footer class="mt-5 footer fixed-bottom mt-auto py-3" style="background: #fff;">
 
-        <marquee class="font-thai" style="font-weight: bold; font-size: 1rem"><span class="text-muted text-center">Design website by นายอภิชน ประสาทศรี , พุฒิพงศ์ ใหญ่แก้ว &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Coding โดย นายอานุภาพ ศรเทียน &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ควบคุมโดย นนท์ บรรณวัฒน์ นักวิชาการคอมพิวเตอร์ ปฏิบัติการ</span>
-        </marquee>
-
-    </footer>
     <!-- Link to Bootstrap 5 JS, if needed -->
     <!-- <script src="bootstrap/bootstrap-5.3.2-dist/js/bootstrap.min.js"></script> -->
     <script src="bootstrap/bootstrap/js/bootstrap.bundle.min.js"></script>
