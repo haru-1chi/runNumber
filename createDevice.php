@@ -52,6 +52,7 @@ function generateNewComputerNumber($lastNumber)
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Link to Bootstrap 5 CSS -->
     <!-- <link rel="stylesheet" href="bootstrap/bootstrap-5.3.2-dist/css/bootstrap.min.css"> -->
+    <link rel="shortcut icon" href="image/logo.png" type="image/x-icon">
     <link rel="stylesheet" href="bootstrap/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
@@ -62,7 +63,7 @@ function generateNewComputerNumber($lastNumber)
 </head>
 
 <body>
-<?php navbar(); ?>
+    <?php navbar(); ?>
     <!-- <nav class="navbar navbar-expand-lg" style="background-color: #365486;">
         <div class="container p-2" style="background-color: #365486; box-shadow: none;">
             <a class="navbar-brand" href="../orderit/dashboard.php" style="color: #ffffff; font-weight: 900;">ระบบบริหารงานซ่อม</a>

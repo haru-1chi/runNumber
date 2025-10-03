@@ -15,6 +15,7 @@ require_once 'config/db.php';
 
   <!-- Bootstrap CSS v5.2.1 -->
   <!-- <link rel="stylesheet" href="bootstrap/bootstrap-5.3.2-dist/css/bootstrap.min.css"> -->
+  <link rel="shortcut icon" href="image/logo.png" type="image/x-icon">
   <link rel="stylesheet" href="bootstrap/bootstrap/css/bootstrap.min.css">
   <link rel="stylesheet" href="css/style.css">
 

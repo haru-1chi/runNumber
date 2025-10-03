@@ -12,7 +12,7 @@ $id = $_GET['id'];
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
     <title>พิมพ์สติ๊กเกอร์</title>
-
+    <link rel="shortcut icon" href="image/logo.png" type="image/x-icon">
     <!-- Behavioral Meta Data -->
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <link rel="stylesheet" href="bootstrap/bootstrap-5.3.2-dist/css/bootstrap.min.css">
