@@ -110,6 +110,7 @@ function navbar()
                             ยืมคืนอุปกรณ์
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                            <li><a class="dropdown-item" href="../repair/Test_calendar.php">ปฏิทินการยืม</a></li>
                             <li><a class="dropdown-item" href="../repair/borrow.php">ยืม</a></li>
                             <li><a class="dropdown-item" href="../repair/admin.php">สำหรับเจ้าหน้าที่</a></li>
                         </ul>
